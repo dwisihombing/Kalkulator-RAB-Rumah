@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Print/Export — RABPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --green: #1a9e6f;
+  --green-d: #0f7a54;
+  --green-l: #e8f7f1;
+  --green-t: #0a5e3f;
+  --gray-50: #f8f9fa;
+  --gray-100: #f1f3f4;
+  --gray-200: #e8eaed;
+  --gray-400: #9aa0a6;
+  --gray-600: #5f6368;
+  --gray-800: #202124;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-800);font-size:13px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--green);text-decoration:none}
+
+/* HEADER */
+.site-header{background:var(--white);border-bottom:1px solid var(--gray-200);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{background:var(--green);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;padding:5px 10px;border-radius:6px;letter-spacing:.3px}
+.brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:var(--gray-800)}
+.brand-sub{font-size:10px;color:var(--gray-400);margin-left:4px}
+.menu-toggle{display:none;width:40px;height:40px;border:none;background:transparent;cursor:pointer;color:var(--gray-600);font-size:20px}
+
+/* MAIN LAYOUT */
+.layout{display:flex;flex:1}
+.sidebar{background:var(--white);border-right:1px solid var(--gray-200);width:240px;overflow-y:auto;position:relative;z-index:40}
+.main-content{flex:1;overflow-y:auto}
+
+/* NAVIGATION MENU */
+.nav-menu{display:flex;flex-direction:column;padding:12px 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;color:var(--gray-600);cursor:pointer;border-left:3px solid transparent;transition:all .15s;pointer-events:auto;user-select:none}
+.nav-item:hover{background:var(--gray-50);color:var(--gray-800)}
+.nav-item.active{background:var(--green-l);color:var(--green);border-left-color:var(--green);font-weight:600}
+.nav-item:focus{outline:2px solid var(--green);outline-offset:-2px}
+
+/* CONTAINER */
+.container{padding:20px 24px;max-width:100%;margin:0 auto}
+
+/* PRINT */
+.print-section{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.print-option{display:flex;align-items:center;gap:8px;padding:12px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:8px;cursor:pointer;transition:all .15s;margin-bottom:8px}
+.print-option:hover{background:var(--green-l);border-color:var(--green)}
+.print-option input{cursor:pointer}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--gray-200);background:var(--white);color:var(--gray-600);transition:all .15s}
+.btn:hover{background:var(--gray-100);border-color:var(--gray-400)}
+.btn-primary{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-primary:hover{background:var(--green-d);border-color:var(--green-d)}
+.btn-group{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+
+/* FOOTER */
+.site-footer{text-align:center;padding:20px 24px;color:var(--gray-400);font-size:11px;margin-top:auto;border-top:1px solid var(--gray-200)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .menu-toggle{display:block}
+  .brand-sub{display:none}
+
+  .layout{position:relative}
+  .sidebar{position:fixed;left:0;top:56px;height:calc(100vh-56px);width:240px;transform:translateX(-100%);transition:transform .3s;z-index:40;box-shadow:var(--shadow-md);overflow-y:auto}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{width:100%}
+}
+
+@media(max-width:480px){
+  .brand-name{font-size:13px}
+  .brand{gap:6px}
+  .container{padding:16px 12px}
+
+  .btn{padding:6px 12px;font-size:11px}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-logo">RABPro</span>
+    <span class="brand-name">Kalkulator RAB Rumah</span>
+    <span class="brand-sub">AHSP PUPR 2026</span>
+  </div>
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav class="nav-menu">
+      <div class="nav-item" onclick="switchPage('home', this)" role="button" tabindex="0">🏠 Home</div>
+      <div class="nav-item" onclick="switchPage('pekerjaan', this)" role="button" tabindex="0">📋 Uraian Pekerjaan</div>
+      <div class="nav-item" onclick="switchPage('upah', this)" role="button" tabindex="0">👷 Biaya Upah Tukang</div>
+      <div class="nav-item active" onclick="switchPage('print', this)" role="button" tabindex="0">🖨️ Print/Export</div>
+      <div class="nav-item" onclick="switchPage('about', this)" role="button" tabindex="0">ℹ️ About</div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="container">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;font-family:'Plus Jakarta Sans',sans-serif">Print / Export</h2>
+
+      <div class="print-section">
+        <h3>Opsi Cetak</h3>
+        <label class="print-option">
+          <input type="radio" name="print-format" value="full" checked>
+          <div>
+            <div style="font-size:12px;font-weight:600">Lengkap</div>
+            <div style="font-size:11px;color:var(--gray-600)">Semua detail & perhitungan</div>
+          </div>
+        </label>
+        <label class="print-option">
+          <input type="radio" name="print-format" value="summary">
+          <div>
+            <div style="font-size:12px;font-weight:600">Ringkasan</div>
+            <div style="font-size:11px;color:var(--gray-600)">Hanya rekapan total</div>
+          </div>
+        </label>
+
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="doPrint()">🖨️ Cetak Langsung</button>
+          <button class="btn btn-primary" onclick="doExportPDF()">📄 Export PDF</button>
+          <button class="btn btn-primary" onclick="doExportExcel()">📊 Export Excel</button>
+        </div>
+
+        <div class="print-section" style="margin-top:18px;">
+          <h3>Template Export Tersembunyi</h3>
+          <p style="font-size:12px;color:var(--gray-600);margin-bottom:10px">Halaman export dibuat secara internal di sini, lalu diproses untuk PDF atau Excel tanpa harus tampil di menu utama.</p>
+          <div id="export-template" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer class="site-footer">
+  RABPro — Kalkulator RAB Rumah • AHSP PUPR 2026 • v2.0 - Fully Responsive
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+
+// UI Navigation
+function toggleSidebar(){
+  $('sidebar').classList.toggle('open');
+}
+
+function switchPage(pageName, element){
+  window.location.href = pageName === 'home' ? '../index.html' : `${pageName}.html`;
+}
+
+// Add keyboard support for nav items
+document.addEventListener('keydown', function(e) {
+  if(e.target.classList.contains('nav-item') && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    const pageName = e.target.textContent.includes('Home') ? 'home' :
+                    e.target.textContent.includes('Uraian') ? 'pekerjaan' :
+                    e.target.textContent.includes('Upah') ? 'upah' :
+                    e.target.textContent.includes('Print') ? 'print' :
+                    e.target.textContent.includes('About') ? 'about' : 'home';
+    switchPage(pageName, e.target);
+  }
+});
+
+// Print Functions
+function doPrint(){
+  window.print();
+}
+
+async function doExportPDF(){
+  if (typeof html2pdf === 'undefined') {
+    alert('Library PDF tidak tersedia. Silakan refresh halaman dan coba lagi.');
+    return;
+  }
+
+  const btn = document.querySelector('button[onclick="doExportPDF()"]');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '⏳ Membuat PDF...';
+  btn.disabled = true;
+
+  try {
+    const pdfContent = createExportContent();
+    const options = {
+      margin: [15, 15, 15, 15],
+      filename: `RAB-${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.95 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 794,
+        windowHeight: 1123
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait',
+        compress: true,
+        putOnlyUsedFonts: true
+      }
+    };
+
+    html2pdf().set(options).from(pdfContent).save().then(() => {
+      cleanupExportContent(pdfContent);
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+      alert('PDF berhasil dibuat dan diunduh!');
+    }).catch((error) => {
+      cleanupExportContent(pdfContent);
+      console.error('PDF Export Error:', error);
+      alert('Terjadi kesalahan saat membuat PDF: ' + (error.message || 'Unknown error') + '. Silakan coba lagi.');
+      btn.innerHTML = originalText;
+      btn.disabled = false;
+    });
+  } catch (error) {
+    console.error('PDF Setup Error:', error);
+    alert('Terjadi kesalahan saat menyiapkan PDF: ' + (error.message || 'Unknown error') + '. Silakan coba lagi.');
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+function doExportExcel(){
+  if (typeof XLSX === 'undefined') {
+    alert('Library Excel tidak tersedia. Silakan refresh halaman dan coba lagi.');
+    return;
+  }
+
+  const data = getRabData();
+  const general = data.general || {};
+  const pekerjaan = data.pekerjaan || {};
+  const totals = pekerjaan.totals || {};
+  const upah = data.upah || {};
+  const borongan = upah.borongan || {};
+  const harian = upah.harian || {};
+
+  const wb = XLSX.utils.book_new();
+  wb.Props = {
+    Title: 'Laporan RABPro',
+    Subject: 'RAB Rumah',
+    Author: 'RABPro',
+    CreatedDate: new Date()
+  };
+
+  const generalSheet = XLSX.utils.json_to_sheet([
+    { Field: 'Nama Proyek', Value: general.projectName || '-' },
+    { Field: 'Lokasi', Value: general.location || '-' },
+    { Field: 'Pemilik', Value: general.owner || '-' },
+    { Field: 'Tanggal', Value: formatDate(general.date) },
+    { Field: 'Luas Bangunan (m²)', Value: general.luasBangunan || 0 },
+    { Field: 'Overhead + Profit (%)', Value: general.overhead || 0 },
+    { Field: 'PPN (%)', Value: general.ppn || 0 }
+  ]);
+  XLSX.utils.book_append_sheet(wb, generalSheet, 'Informasi Umum');
+
+  const pekerjaanRows = [
+    ['Bagian', 'Total Biaya'],
+    ['Tanah', totals.t1 || 0],
+    ['Pondasi', totals.t2 || 0],
+    ['Struktur', totals.t3 || 0],
+    ['Dinding', totals.t4 || 0],
+    ['Atap', totals.t5 || 0],
+    ['Lantai', totals.t6 || 0],
+    ['Plafon', totals.t7 || 0],
+    ['Pintu & Jendela', totals.t8 || 0],
+    ['Sanitasi', totals.t9 || 0],
+    ['Listrik & MEP', totals.t10 || 0],
+    ['Finishing', totals.t11 || 0],
+    ['Total RAB', pekerjaan.totalRAB || 0]
+  ];
+  const pekerjaanSheet = XLSX.utils.aoa_to_sheet(pekerjaanRows);
+  XLSX.utils.book_append_sheet(wb, pekerjaanSheet, 'Uraian Pekerjaan');
+
+  const upahRows = [
+    ['Jenis', 'Nilai'],
+    ['Borongan Luas (m²)', borongan.luas || 0],
+    ['Borongan Harga Min', borongan.min || 0],
+    ['Borongan Harga Max', borongan.max || 0],
+    ['Borongan Total Avg', borongan.totalAvg || 0],
+    ['Harian Jumlah Tukang', harian.tukang || 0],
+    ['Harian Total Tukang', harian.totalTukang || 0],
+    ['Harian Total Asisten', harian.totalAsisten || 0],
+    ['Harian Total Biaya', harian.total || 0]
+  ];
+  const upahSheet = XLSX.utils.aoa_to_sheet(upahRows);
+  XLSX.utils.book_append_sheet(wb, upahSheet, 'Biaya Upah');
+
+  XLSX.writeFile(wb, `RABPro-${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+function cleanupExportContent(contentContainer){
+  if(contentContainer && contentContainer.parentNode){
+    contentContainer.parentNode.removeChild(contentContainer);
+  }
+}
+
+function createExportContent(){
+  const existing = document.getElementById('export-template');
+  if(!existing) throw new Error('Template export tidak tersedia.');
+
+  const data = getRabData();
+  const general = data.general || {};
+  const pekerjaan = data.pekerjaan || {};
+  const totals = pekerjaan.totals || {};
+  const upah = data.upah || {};
+  const borongan = upah.borongan || {};
+  const harian = upah.harian || {};
+
+  const container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.left = '-9999px';
+  container.style.top = '-9999px';
+  container.style.width = '210mm';
+  container.style.minHeight = '297mm';
+  container.style.padding = '20px';
+  container.style.background = '#fff';
+  container.style.color = '#000';
+  container.style.fontFamily = 'Arial, sans-serif';
+
+  container.innerHTML = `
+    <div style="margin-bottom:20px;">
+      <h1 style="font-size:20px;margin-bottom:6px;">RABPro — Laporan RAB Rumah</h1>
+      <p style="font-size:12px;color:#555;margin:0 0 4px 0;">Dokumen otomatis dari RABPro.</p>
+      <p style="font-size:12px;color:#555;margin:0;">Tanggal: ${formatDate(general.date)}</p>
+    </div>
+    <div style="margin-bottom:18px;">
+      <h2 style="font-size:16px;margin-bottom:10px;color:#1a9e6f;">Informasi Umum</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tbody>
+          <tr><td style="padding:6px;border:1px solid #ddd;width:200px;">Nama Proyek</td><td style="padding:6px;border:1px solid #ddd;">${general.projectName || '-'}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Lokasi</td><td style="padding:6px;border:1px solid #ddd;">${general.location || '-'}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Pemilik</td><td style="padding:6px;border:1px solid #ddd;">${general.owner || '-'}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Luas Bangunan</td><td style="padding:6px;border:1px solid #ddd;">${general.luasBangunan || 0} m²</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Overhead + Profit</td><td style="padding:6px;border:1px solid #ddd;">${general.overhead || 0}%</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">PPN</td><td style="padding:6px;border:1px solid #ddd;">${general.ppn || 0}%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-bottom:18px;">
+      <h2 style="font-size:16px;margin-bottom:10px;color:#1a9e6f;">Uraian Pekerjaan</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr><th style="padding:8px;border:1px solid #ddd;text-align:left;background:#f1f3f4;">Bagian</th><th style="padding:8px;border:1px solid #ddd;text-align:right;background:#f1f3f4;">Total Biaya</th></tr></thead>
+        <tbody>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Tanah</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t1 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Pondasi</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t2 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Struktur</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t3 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Dinding</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t4 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Atap</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t5 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Lantai</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t6 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Plafon</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t7 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Pintu & Jendela</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t8 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Sanitasi</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t9 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Listrik & MEP</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t10 || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Finishing</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(totals.t11 || 0)}</td></tr>
+          <tr><td style="padding:8px;border:1px solid #ddd;font-weight:700;">Total RAB</td><td style="padding:8px;border:1px solid #ddd;text-align:right;font-weight:700;">${formatCurrency(pekerjaan.totalRAB || 0)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-bottom:18px;">
+      <h2 style="font-size:16px;margin-bottom:10px;color:#1a9e6f;">Biaya Upah Tukang</h2>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tbody>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Boranagn Luas</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${borongan.luas || 0} m²</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Harga Min</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(borongan.min || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Harga Max</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(borongan.max || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Rata-rata</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(borongan.totalAvg || 0)}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Jumlah Tukang</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${harian.tukang || 0}</td></tr>
+          <tr><td style="padding:6px;border:1px solid #ddd;">Total Biaya Harian</td><td style="padding:6px;border:1px solid #ddd;text-align:right;">${formatCurrency(harian.total || 0)}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px;color:#555;padding:12px;border:1px solid #ddd;background:#fafafa;">Catatan: Laporan ini dibuat berdasarkan data yang disimpan di browser.</div>
+  `;
+
+  document.body.appendChild(container);
+  return container;
+}
+
+function getRabData(){
+  return JSON.parse(localStorage.getItem('rabData') || '{}');
+}
+
+function formatCurrency(amount){
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount || 0);
+}
+
+function formatDate(value){
+  if(!value) return '-';
+  const date = new Date(value);
+  if(isNaN(date.getTime())) return '-';
+  return date.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+</script>
+
+</body>
+</html>

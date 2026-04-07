@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Biaya Upah Tukang — RABPro</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root {
+  --green: #1a9e6f;
+  --green-d: #0f7a54;
+  --green-l: #e8f7f1;
+  --green-t: #0a5e3f;
+  --gray-50: #f8f9fa;
+  --gray-100: #f1f3f4;
+  --gray-200: #e8eaed;
+  --gray-400: #9aa0a6;
+  --gray-600: #5f6368;
+  --gray-800: #202124;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-800);font-size:13px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--green);text-decoration:none}
+
+/* HEADER */
+.site-header{background:var(--white);border-bottom:1px solid var(--gray-200);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{background:var(--green);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;padding:5px 10px;border-radius:6px;letter-spacing:.3px}
+.brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:var(--gray-800)}
+.brand-sub{font-size:10px;color:var(--gray-400);margin-left:4px}
+.menu-toggle{display:none;width:40px;height:40px;border:none;background:transparent;cursor:pointer;color:var(--gray-600);font-size:20px}
+
+/* MAIN LAYOUT */
+.layout{display:flex;flex:1}
+.sidebar{background:var(--white);border-right:1px solid var(--gray-200);width:240px;overflow-y:auto;position:relative;z-index:40}
+.main-content{flex:1;overflow-y:auto}
+
+/* NAVIGATION MENU */
+.nav-menu{display:flex;flex-direction:column;padding:12px 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;color:var(--gray-600);cursor:pointer;border-left:3px solid transparent;transition:all .15s;pointer-events:auto;user-select:none}
+.nav-item:hover{background:var(--gray-50);color:var(--gray-800)}
+.nav-item.active{background:var(--green-l);color:var(--green);border-left-color:var(--green);font-weight:600}
+.nav-item:focus{outline:2px solid var(--green);outline-offset:-2px}
+
+/* CONTAINER */
+.container{padding:20px 24px;max-width:100%;margin:0 auto}
+
+/* LABOR CALC */
+.labor-system{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.labor-system h3{font-size:14px;font-weight:600;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid var(--gray-200)}
+.labor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:16px}
+.labor-field{display:flex;flex-direction:column;gap:4px}
+.labor-field label{font-size:11px;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:.04em}
+.labor-field input{padding:8px 12px;border:1px solid var(--gray-200);border-radius:6px;font-size:12px;background:var(--white);color:var(--gray-800);outline:none;transition:border-color .15s}
+.labor-field input:focus{border-color:var(--green)}
+.labor-result{background:var(--green-l);border:1px solid var(--green);border-radius:var(--radius);padding:14px;text-align:center}
+.labor-result .label{font-size:11px;color:var(--gray-600);text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.labor-result .value{font-size:18px;font-weight:700;color:var(--green);font-family:'Plus Jakarta Sans',sans-serif}
+
+/* FOOTER */
+.site-footer{text-align:center;padding:20px 24px;color:var(--gray-400);font-size:11px;margin-top:auto;border-top:1px solid var(--gray-200)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .menu-toggle{display:block}
+  .brand-sub{display:none}
+
+  .layout{position:relative}
+  .sidebar{position:fixed;left:0;top:56px;height:calc(100vh-56px);width:240px;transform:translateX(-100%);transition:transform .3s;z-index:40;box-shadow:var(--shadow-md);overflow-y:auto}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{width:100%}
+
+  .labor-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:480px){
+  .brand-name{font-size:13px}
+  .brand{gap:6px}
+  .container{padding:16px 12px}
+
+  .labor-result .value{font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-logo">RABPro</span>
+    <span class="brand-name">Kalkulator RAB Rumah</span>
+    <span class="brand-sub">AHSP PUPR 2026</span>
+  </div>
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav class="nav-menu">
+      <div class="nav-item" onclick="switchPage('home', this)" role="button" tabindex="0">🏠 Home</div>
+      <div class="nav-item" onclick="switchPage('pekerjaan', this)" role="button" tabindex="0">📋 Uraian Pekerjaan</div>
+      <div class="nav-item active" onclick="switchPage('upah', this)" role="button" tabindex="0">👷 Biaya Upah Tukang</div>
+      <div class="nav-item" onclick="switchPage('print', this)" role="button" tabindex="0">🖨️ Print/Export</div>
+      <div class="nav-item" onclick="switchPage('about', this)" role="button" tabindex="0">ℹ️ About</div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="container">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;font-family:'Plus Jakarta Sans',sans-serif">Biaya Upah Tukang</h2>
+
+      <!-- SISTEM BORONGAN -->
+      <div class="labor-system">
+        <h3>Sistem Borongan (per m² Luas Bangunan)</h3>
+        <p style="font-size:12px;color:var(--gray-600);margin-bottom:16px">Hitung upah tukang berdasarkan luas bangunan. Masukkan range harga upah per m².</p>
+
+        <div class="labor-grid">
+          <div class="labor-field">
+            <label>Luas Bangunan (m²)</label>
+            <input type="number" id="borongan_luas" value="36" oninput="hitungBorongan()">
+          </div>
+          <div class="labor-field">
+            <label>Harga Minimum (Rp/m²)</label>
+            <input type="number" id="borongan_min" value="1500000" oninput="hitungBorongan()">
+          </div>
+          <div class="labor-field">
+            <label>Harga Maksimum (Rp/m²)</label>
+            <input type="number" id="borongan_max" value="2500000" oninput="hitungBorongan()">
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px">
+          <div class="labor-result"><div class="label">Total Minimum</div><div class="value" id="borongan-min-result">Rp 0</div></div>
+          <div class="labor-result"><div class="label">Total Maksimum</div><div class="value" id="borongan-max-result">Rp 0</div></div>
+          <div class="labor-result" style="background:var(--green);border-color:var(--green-d)"><div class="label" style="color:#fff">Rata-rata</div><div class="value" style="color:#fff" id="borongan-avg-result">Rp 0</div></div>
+        </div>
+      </div>
+
+      <!-- SISTEM HARIAN -->
+      <div class="labor-system">
+        <h3>Sistem Harian (per Hari Kerja)</h3>
+        <p style="font-size:12px;color:var(--gray-600);margin-bottom:16px">Hitung biaya upah berdasarkan jumlah tenaga kerja dan durasi pekerjaan.</p>
+
+        <div class="labor-grid">
+          <div class="labor-field"><label>Jumlah Tukang</label><input type="number" id="harian_tukang" value="1" oninput="hitungHarian()"></div>
+          <div class="labor-field"><label>Upah Tukang/Hari (Rp)</label><input type="number" id="harian_upah_tukang" value="150000" oninput="hitungHarian()"></div>
+          <div class="labor-field"><label>Jumlah Asisten/Ladang</label><input type="number" id="harian_asisten" value="1" oninput="hitungHarian()"></div>
+          <div class="labor-field"><label>Upah Asisten/Hari (Rp)</label><input type="number" id="harian_upah_asisten" value="80000" oninput="hitungHarian()"></div>
+          <div class="labor-field"><label>Durasi Pekerjaan (hari)</label><input type="number" id="harian_durasi" value="10" oninput="hitungHarian()"></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:12px">
+          <div class="labor-result"><div class="label">Total Biaya Tukang</div><div class="value" id="harian-tukang-result">Rp 0</div></div>
+          <div class="labor-result"><div class="label">Total Biaya Asisten</div><div class="value" id="harian-asisten-result">Rp 0</div></div>
+          <div class="labor-result" style="background:var(--green);border-color:var(--green-d)"><div class="label" style="color:#fff">Total Biaya</div><div class="value" style="color:#fff" id="harian-total-result">Rp 0</div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer class="site-footer">
+  RABPro — Kalkulator RAB Rumah • AHSP PUPR 2026 • v2.0 - Fully Responsive
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+
+// UI Navigation
+function toggleSidebar(){
+  $('sidebar').classList.toggle('open');
+}
+
+function switchPage(pageName, element){
+  window.location.href = pageName === 'home' ? '../index.html' : `${pageName}.html`;
+}
+
+// Add keyboard support for nav items
+document.addEventListener('keydown', function(e) {
+  if(e.target.classList.contains('nav-item') && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    const pageName = e.target.textContent.includes('Home') ? 'home' :
+                    e.target.textContent.includes('Uraian') ? 'pekerjaan' :
+                    e.target.textContent.includes('Upah') ? 'upah' :
+                    e.target.textContent.includes('Print') ? 'print' :
+                    e.target.textContent.includes('About') ? 'about' : 'home';
+    switchPage(pageName, e.target);
+  }
+});
+
+// Labor calculation functions
+function hitungBorongan(){
+  const luas = parseFloat($('borongan_luas').value) || 0;
+  const min = parseFloat($('borongan_min').value) || 0;
+  const max = parseFloat($('borongan_max').value) || 0;
+  const avg = (min + max) / 2;
+
+  const totalMin = luas * min;
+  const totalMax = luas * max;
+  const totalAvg = luas * avg;
+
+  $('borongan-min-result').textContent = 'Rp ' + formatNumber(totalMin);
+  $('borongan-max-result').textContent = 'Rp ' + formatNumber(totalMax);
+  $('borongan-avg-result').textContent = 'Rp ' + formatNumber(totalAvg);
+  saveRabData({upah:{borongan:{
+    luas,
+    min,
+    max,
+    totalMin,
+    totalMax,
+    totalAvg
+  }}});
+}
+
+function hitungHarian(){
+  const tukang = parseFloat($('harian_tukang').value) || 0;
+  const upahTukang = parseFloat($('harian_upah_tukang').value) || 0;
+  const asisten = parseFloat($('harian_asisten').value) || 0;
+  const upahAsisten = parseFloat($('harian_upah_asisten').value) || 0;
+  const durasi = parseFloat($('harian_durasi').value) || 0;
+
+  const totalTukang = tukang * upahTukang * durasi;
+  const totalAsisten = asisten * upahAsisten * durasi;
+  const total = totalTukang + totalAsisten;
+
+  $('harian-tukang-result').textContent = 'Rp ' + formatNumber(totalTukang);
+  $('harian-asisten-result').textContent = 'Rp ' + formatNumber(totalAsisten);
+  $('harian-total-result').textContent = 'Rp ' + formatNumber(total);
+  saveRabData({upah:{harian:{
+    tukang,
+    upahTukang,
+    asisten,
+    upahAsisten,
+    durasi,
+    totalTukang,
+    totalAsisten,
+    total
+  }}});
+}
+
+function formatNumber(num) {
+  if (num === 0 || isNaN(num)) return '0';
+  return Math.round(num).toLocaleString('id-ID');
+}
+
+function getRabData(){
+  return JSON.parse(localStorage.getItem('rabData') || '{}');
+}
+
+function saveRabData(partial){
+  const current = getRabData();
+  if(partial.general){
+    current.general = {...current.general, ...partial.general};
+  }
+  if(partial.pekerjaan){
+    current.pekerjaan = {...current.pekerjaan, ...partial.pekerjaan};
+  }
+  if(partial.upah){
+    current.upah = {...current.upah, ...partial.upah};
+  }
+  localStorage.setItem('rabData', JSON.stringify(current));
+}
+
+// Initialize calculations
+hitungBorongan();
+hitungHarian();
+</script>
+
+</body>
+</html>

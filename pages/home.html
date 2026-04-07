@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RABPro — Kalkulator RAB Rumah</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root {
+  --green: #1a9e6f;
+  --green-d: #0f7a54;
+  --green-l: #e8f7f1;
+  --green-t: #0a5e3f;
+  --gray-50: #f8f9fa;
+  --gray-100: #f1f3f4;
+  --gray-200: #e8eaed;
+  --gray-400: #9aa0a6;
+  --gray-600: #5f6368;
+  --gray-800: #202124;
+  --white: #ffffff;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+  --radius: 10px;
+  --radius-lg: 14px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--gray-50);color:var(--gray-800);font-size:13px;min-height:100vh;display:flex;flex-direction:column}
+a{color:var(--green);text-decoration:none}
+
+/* HEADER */
+.site-header{background:var(--white);border-bottom:1px solid var(--gray-200);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:50;box-shadow:var(--shadow-sm)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-logo{background:var(--green);color:#fff;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;padding:5px 10px;border-radius:6px;letter-spacing:.3px}
+.brand-name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:15px;color:var(--gray-800)}
+.brand-sub{font-size:10px;color:var(--gray-400);margin-left:4px}
+.menu-toggle{display:none;width:40px;height:40px;border:none;background:transparent;cursor:pointer;color:var(--gray-600);font-size:20px}
+
+/* MAIN LAYOUT */
+.layout{display:flex;flex:1}
+.sidebar{background:var(--white);border-right:1px solid var(--gray-200);width:240px;overflow-y:auto;position:relative;z-index:40}
+.main-content{flex:1;overflow-y:auto}
+
+/* NAVIGATION MENU */
+.nav-menu{display:flex;flex-direction:column;padding:12px 0}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 16px;color:var(--gray-600);cursor:pointer;border-left:3px solid transparent;transition:all .15s;pointer-events:auto;user-select:none}
+.nav-item:hover{background:var(--gray-50);color:var(--gray-800)}
+.nav-item.active{background:var(--green-l);color:var(--green);border-left-color:var(--green);font-weight:600}
+.nav-item:focus{outline:2px solid var(--green);outline-offset:-2px}
+
+/* CONTAINER */
+.container{padding:20px 24px;max-width:100%;margin:0 auto}
+
+/* DASHBOARD CARDS */
+.dashboard-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:20px;box-shadow:var(--shadow-sm);transition:all .15s}
+.card:hover{box-shadow:var(--shadow-md);border-color:var(--gray-400)}
+.card-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.card-icon{font-size:20px}
+.card-title{font-size:14px;font-weight:600;color:var(--gray-800);font-family:'Plus Jakarta Sans',sans-serif}
+.card-value{font-size:24px;font-weight:700;color:var(--green);font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:4px}
+.card-desc{font-size:11px;color:var(--gray-600);line-height:1.4}
+
+/* QUICK ACTIONS */
+.quick-actions{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.quick-actions h3{font-size:16px;font-weight:700;margin-bottom:16px;font-family:'Plus Jakarta Sans',sans-serif}
+.action-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.action-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px;border:1px solid var(--gray-200);border-radius:10px;background:var(--gray-50);cursor:pointer;transition:all .15s;text-align:center}
+.action-btn:hover{background:var(--green-l);border-color:var(--green);color:var(--green)}
+.action-btn-icon{font-size:24px;margin-bottom:4px}
+.action-btn-title{font-size:12px;font-weight:600}
+.action-btn-desc{font-size:10px;color:var(--gray-600);line-height:1.3}
+
+/* PROJECT INFO */
+.proj-card{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--gray-200);padding:20px;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.proj-card h3{font-size:16px;font-weight:700;margin-bottom:16px;font-family:'Plus Jakarta Sans',sans-serif}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+.pi{display:flex;flex-direction:column;gap:4px}
+.pi label{font-size:10px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em}
+.pi input{border:none;border-bottom:1.5px solid var(--gray-200);padding:6px 0;font-size:13px;font-weight:500;color:var(--gray-800);background:transparent;outline:none;font-family:'Inter',sans-serif;transition:border-color .15s}
+.pi input:focus{border-bottom-color:var(--green)}
+
+/* FOOTER */
+.site-footer{text-align:center;padding:20px 24px;color:var(--gray-400);font-size:11px;margin-top:auto;border-top:1px solid var(--gray-200)}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .menu-toggle{display:block}
+  .brand-sub{display:none}
+
+  .layout{position:relative}
+  .sidebar{position:fixed;left:0;top:56px;height:calc(100vh-56px);width:240px;transform:translateX(-100%);transition:transform .3s;z-index:40;box-shadow:var(--shadow-md);overflow-y:auto}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{width:100%}
+
+  .dashboard-grid{grid-template-columns:1fr}
+  .action-grid{grid-template-columns:repeat(2,1fr)}
+  .info-grid{grid-template-columns:1fr}
+}
+
+@media(max-width:480px){
+  .brand-name{font-size:13px}
+  .brand{gap:6px}
+  .container{padding:16px 12px}
+
+  .card{padding:16px}
+  .card-value{font-size:20px}
+  .action-btn{padding:12px}
+  .action-btn-icon{font-size:20px}
+  .action-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-logo">RABPro</span>
+    <span class="brand-name">Kalkulator RAB Rumah</span>
+    <span class="brand-sub">AHSP PUPR 2026</span>
+  </div>
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+</header>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <nav class="nav-menu">
+      <div class="nav-item active" onclick="switchPage('home', this)" role="button" tabindex="0">🏠 Home</div>
+      <div class="nav-item" onclick="switchPage('pekerjaan', this)" role="button" tabindex="0">📋 Uraian Pekerjaan</div>
+      <div class="nav-item" onclick="switchPage('upah', this)" role="button" tabindex="0">👷 Biaya Upah Tukang</div>
+      <div class="nav-item" onclick="switchPage('print', this)" role="button" tabindex="0">🖨️ Print/Export</div>
+      <div class="nav-item" onclick="switchPage('about', this)" role="button" tabindex="0">ℹ️ About</div>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    <div class="container">
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:20px;font-family:'Plus Jakarta Sans',sans-serif">Dashboard RAB</h2>
+
+      <!-- DASHBOARD CARDS -->
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">🏗️</span>
+            <span class="card-title">Total RAB</span>
+          </div>
+          <div class="card-value" id="total-rab">Rp 0</div>
+          <div class="card-desc">Total estimasi biaya pembangunan rumah</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">📊</span>
+            <span class="card-title">Luas Bangunan</span>
+          </div>
+          <div class="card-value" id="luas-bangunan">0 m²</div>
+          <div class="card-desc">Luas total area konstruksi</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">👷</span>
+            <span class="card-title">Biaya Upah</span>
+          </div>
+          <div class="card-value" id="biaya-upah">Rp 0</div>
+          <div class="card-desc">Total biaya tenaga kerja</div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-icon">📋</span>
+            <span class="card-title">Item Pekerjaan</span>
+          </div>
+          <div class="card-value" id="item-pekerjaan">11</div>
+          <div class="card-desc">Jumlah kategori pekerjaan SNI</div>
+        </div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-actions">
+        <h3>Aksi Cepat</h3>
+        <div class="action-grid">
+          <div class="action-btn" onclick="switchPage('pekerjaan')">
+            <div class="action-btn-icon">📋</div>
+            <div class="action-btn-title">Uraian Pekerjaan</div>
+            <div class="action-btn-desc">Hitung detail biaya per bagian</div>
+          </div>
+          <div class="action-btn" onclick="switchPage('upah')">
+            <div class="action-btn-icon">👷</div>
+            <div class="action-btn-title">Biaya Upah</div>
+            <div class="action-btn-desc">Kalkulasi sistem borongan & harian</div>
+          </div>
+          <div class="action-btn" onclick="switchPage('print')">
+            <div class="action-btn-icon">🖨️</div>
+            <div class="action-btn-title">Print/Export</div>
+            <div class="action-btn-desc">Cetak atau export RAB ke PDF</div>
+          </div>
+          <div class="action-btn" onclick="window.open('https://www.pu.go.id/ahsp', '_blank')">
+            <div class="action-btn-icon">📖</div>
+            <div class="action-btn-title">AHSP PUPR</div>
+            <div class="action-btn-desc">Referensi resmi koefisien SNI</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-card">
+        <h3>Informasi Umum Proyek</h3>
+        <div class="proj-grid">
+          <div class="pi"><label>Nama Proyek</label><input id="pn" value="Rumah Tinggal Type 36" oninput="saveGeneralData()"></div>
+          <div class="pi"><label>Lokasi Proyek</label><input id="pl" value="Jakarta" oninput="saveGeneralData()"></div>
+          <div class="pi"><label>Pemilik Proyek</label><input id="po" value="-" oninput="saveGeneralData()"></div>
+          <div class="pi"><label>Tanggal</label><input type="date" id="pd" oninput="saveGeneralData()"></div>
+          <div class="pi"><label>Luas Bangunan (m²)</label><input type="number" id="lb" value="36" oninput="saveGeneralData()"></div>
+          <div class="pi"><label>Overhead + Profit (%)</label><input type="number" id="ohp" value="15" oninput="saveGeneralData()"></div>
+          <div class="pi"><label>PPN (%)</label><input type="number" id="ppnp" value="11" oninput="saveGeneralData()"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer class="site-footer">
+  RABPro — Kalkulator RAB Rumah • AHSP PUPR 2026 • v2.0 - Fully Responsive
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+
+// UI Navigation
+function toggleSidebar(){
+  $('sidebar').classList.toggle('open');
+}
+
+function switchPage(pageName, element){
+  window.location.href = pageName === 'home' ? '../index.html' : `${pageName}.html`;
+}
+
+// Add keyboard support for nav items
+document.addEventListener('keydown', function(e) {
+  if(e.target.classList.contains('nav-item') && (e.key === 'Enter' || e.key === ' ')) {
+    e.preventDefault();
+    const pageName = e.target.textContent.includes('Home') ? 'home' :
+                    e.target.textContent.includes('Uraian') ? 'pekerjaan' :
+                    e.target.textContent.includes('Upah') ? 'upah' :
+                    e.target.textContent.includes('Print') ? 'print' :
+                    e.target.textContent.includes('About') ? 'about' : 'home';
+    switchPage(pageName, e.target);
+  }
+});
+
+const RAB_KEY = 'rabData';
+const defaultGeneral = {
+  projectName: 'Rumah Tinggal Type 36',
+  location: 'Jakarta',
+  owner: '-',
+  date: '',
+  luasBangunan: 36,
+  overhead: 15,
+  ppn: 11
+};
+
+function getRabData(){
+  return JSON.parse(localStorage.getItem(RAB_KEY) || '{}');
+}
+
+function saveRabData(partial){
+  const current = getRabData();
+  if(partial.general){
+    current.general = {...current.general, ...partial.general};
+  }
+  if(partial.pekerjaan){
+    current.pekerjaan = {...current.pekerjaan, ...partial.pekerjaan};
+  }
+  if(partial.upah){
+    current.upah = {...current.upah, ...partial.upah};
+  }
+  localStorage.setItem(RAB_KEY, JSON.stringify(current));
+}
+
+function saveGeneralData(){
+  const general = {
+    projectName: $('pn').value || defaultGeneral.projectName,
+    location: $('pl').value || defaultGeneral.location,
+    owner: $('po').value || defaultGeneral.owner,
+    date: $('pd').value || '',
+    luasBangunan: parseFloat($('lb').value) || 0,
+    overhead: parseFloat($('ohp').value) || 0,
+    ppn: parseFloat($('ppnp').value) || 0
+  };
+  saveRabData({general});
+  updateDashboard(getRabData());
+}
+
+function initDashboard(){
+  const data = getRabData();
+  const general = {...defaultGeneral, ...data.general};
+  $('pn').value = general.projectName;
+  $('pl').value = general.location;
+  $('po').value = general.owner;
+  $('pd').value = general.date;
+  $('lb').value = general.luasBangunan;
+  $('ohp').value = general.overhead;
+  $('ppnp').value = general.ppn;
+  updateDashboard(data);
+}
+
+function updateDashboard(data){
+  const general = {...defaultGeneral, ...data.general};
+  const biayaUpah = data.upah?.harian?.total || data.upah?.borongan?.totalAvg || 0;
+  const totalRAB = data.pekerjaan?.totalRAB || 0;
+  $('total-rab').textContent = formatCurrency(totalRAB);
+  $('luas-bangunan').textContent = general.luasBangunan + ' m²';
+  $('biaya-upah').textContent = formatCurrency(biayaUpah);
+  $('item-pekerjaan').textContent = data.pekerjaan?.totals ? Object.keys(data.pekerjaan.totals).length : 11;
+}
+
+function formatCurrency(amount){
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', initDashboard);
+</script>
+
+</body>
+</html>
