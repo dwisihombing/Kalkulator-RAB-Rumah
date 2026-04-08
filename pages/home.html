@@ -121,6 +121,18 @@ a{color:var(--green);text-decoration:none}
     <span class="brand-name">Kalkulator RAB Rumah</span>
     <span class="brand-sub">AHSP PUPR 2026</span>
   </div>
+  <div style="flex:1"></div>
+  <div id="userMenuBtn" style="display:none;align-items:center;gap:12px;cursor:pointer;padding:8px 12px;border-radius:6px;transition:all .2s" onclick="toggleUserDropdown(event)">
+    <img id="userAvatar" src="https://via.placeholder.com/32" alt="Avatar" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+    <div style="display:flex;flex-direction:column;gap:2px;font-size:12px">
+      <div id="userName" style="font-weight:600">User</div>
+      <div id="userEmail" style="color:var(--gray-600);font-size:11px">email@example.com</div>
+    </div>
+  </div>
+  <div id="userDropdown" style="position:absolute;top:56px;right:16px;background:white;border:1px solid var(--gray-200);border-radius:8px;box-shadow:var(--shadow-md);min-width:200px;z-index:100;display:none;flex-direction:column">
+    <a href="profile.html" style="padding:12px 16px;text-decoration:none;color:var(--gray-800);border-bottom:1px solid var(--gray-200);font-size:13px">👤 Profil</a>
+    <button id="logoutBtn" style="padding:12px 16px;text-align:left;border:none;background:none;cursor:pointer;color:#d32f2f;font-size:13px;width:100%">🚪 Logout</button>
+  </div>
   <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
 </header>
 
@@ -225,8 +237,112 @@ a{color:var(--green);text-decoration:none}
   RABPro-dwisihombing
 </footer>
 
+<script src="../js/auth.js"></script>
 <script>
 const $=id=>document.getElementById(id);
+
+// Initialize page
+async function initPage() {
+  const isAuth = await auth.isAuthenticated();
+  if (isAuth) {
+    await updateUserInfo();
+    setupLogoutButton();
+    setupUserDropdown();
+    
+    // Load saved progress if available
+    const projectToLoad = localStorage.getItem('loadProject');
+    if (projectToLoad) {
+      await loadProjectData(projectToLoad);
+      localStorage.removeItem('loadProject');
+    } else {
+      // Load last saved project or default
+      await loadLastProject();
+    }
+  }
+  // Initialize page data (don't require auth for demo mode)
+  initializePageData();
+  
+  // Auto-save every 30 seconds
+  if (isAuth || auth.isDemo) {
+    setInterval(saveCurrentProject, 30000);
+  }
+}
+
+async function loadProjectData(projectName) {
+  try {
+    const data = await auth.loadProgress(projectName);
+    if (data) {
+      // Populate form with saved data
+      $('pn').value = data.projectName || 'Rumah Tinggal Type 36';
+      $('pl').value = data.projectLocation || 'Jakarta';
+      $('po').value = data.projectOwner || '-';
+      $('pd').value = data.projectDate || new Date().toISOString().split('T')[0];
+      $('lb').value = data.buildingArea || '36';
+      $('ohp').value = data.overheadProfit || '15';
+      $('ppnp').value = data.ppnPercentage || '11';
+      
+      // Trigger recalculation
+      saveGeneralData();
+      
+      console.log('Project data loaded:', projectName);
+    }
+  } catch (err) {
+    console.error('Error loading project:', err);
+  }
+}
+
+async function loadLastProject() {
+  // Implementation for loading last project if needed
+  // For now, just use defaults
+}
+
+function saveCurrentProject() {
+  if (!auth.user && !auth.isDemo) return;
+  
+  const projectData = {
+    projectName: $('pn').value,
+    projectLocation: $('pl').value,
+    projectOwner: $('po').value,
+    projectDate: $('pd').value,
+    buildingArea: $('lb').value,
+    overheadProfit: $('ohp').value,
+    ppnPercentage: $('ppnp').value
+  };
+  
+  const projectName = projectData.projectName || 'Default Project';
+  auth.saveProgress(projectName, projectData)
+    .then(() => {
+      console.log('Progress auto-saved:', projectName);
+    })
+    .catch(err => {
+      console.error('Error auto-saving progress:', err);
+    });
+}
+
+function setupUserDropdown() {
+  document.addEventListener('click', (e) => {
+    const dropdown = $('userDropdown');
+    const userMenu = $('userMenuBtn');
+    if (dropdown && userMenu && !userMenu.contains(e.target) && !dropdown.contains(e.target)) {
+      dropdown.style.display = 'none';
+    }
+  });
+}
+
+function toggleUserDropdown(event) {
+  event.stopPropagation();
+  const dropdown = $('userDropdown');
+  if (dropdown) {
+    dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+  }
+}
+
+function initializePageData() {
+  // Set today's date if not set
+  if (!$('pd').value) {
+    $('pd').value = new Date().toISOString().split('T')[0];
+  }
+}
 
 // UI Navigation
 function toggleSidebar(){
@@ -291,6 +407,11 @@ function saveGeneralData(){
   };
   saveRabData({general});
   updateDashboard(getRabData());
+  
+  // Also save to backend if user is authenticated
+  if (auth && (auth.user || auth.isDemo)) {
+    saveCurrentProject();
+  }
 }
 
 function initDashboard(){
@@ -326,7 +447,10 @@ function formatCurrency(amount){
 }
 
 // Initialize on load
-document.addEventListener('DOMContentLoaded', initDashboard);
+document.addEventListener('DOMContentLoaded', () => {
+  initDashboard();
+  initPage();
+});
 </script>
 
 </body>

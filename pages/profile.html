@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profil - RABPro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #1a9e6f;
+      --green-d: #0f7a54;
+      --green-l: #e8f7f1;
+      --gray-50: #f8f9fa;
+      --gray-100: #f1f3f4;
+      --gray-200: #e8eaed;
+      --gray-400: #9aa0a6;
+      --gray-600: #5f6368;
+      --gray-800: #202124;
+      --white: #ffffff;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+      --radius: 10px;
+      --radius-lg: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      font-size: 13px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    .site-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--gray-200);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      background: var(--green);
+      color: #fff;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      letter-spacing: .3px;
+    }
+
+    .brand-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--gray-800);
+    }
+
+    .header-spacer {
+      flex: 1;
+    }
+
+    .user-menu {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      object-fit: cover;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 12px;
+    }
+
+    .user-email {
+      font-size: 11px;
+      color: var(--gray-600);
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      min-width: 200px;
+      margin-top: 8px;
+      display: none;
+      flex-direction: column;
+      z-index: 100;
+    }
+
+    .dropdown-menu.open {
+      display: flex;
+    }
+
+    .dropdown-item {
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: none;
+      background: none;
+      text-align: left;
+      width: 100%;
+      font-size: 13px;
+    }
+
+    .dropdown-item:hover {
+      background: var(--gray-50);
+    }
+
+    .dropdown-item.danger {
+      color: #d32f2f;
+    }
+
+    .dropdown-item.danger:hover {
+      background: #ffebee;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 40px;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .profile-card {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+
+    .profile-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 32px;
+      border-bottom: 1px solid var(--gray-200);
+      padding-bottom: 24px;
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: var(--green-l);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: 700;
+      color: var(--green);
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-info h1 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .profile-info .provider {
+      display: inline-block;
+      background: var(--green-l);
+      color: var(--green);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--gray-200);
+    }
+
+    .info-row:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: var(--gray-600);
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: var(--gray-800);
+      font-weight: 600;
+    }
+
+    .progress-section h2 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .progress-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 16px;
+    }
+
+    .progress-item {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .progress-item:hover {
+      border-color: var(--green);
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-2px);
+    }
+
+    .progress-item-name {
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .progress-item-date {
+      font-size: 12px;
+      color: var(--gray-600);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray-600);
+    }
+
+    .empty-state svg {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--green);
+      text-decoration: none;
+      margin-bottom: 24px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .back-link:hover {
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .main-content {
+        padding: 20px;
+      }
+
+      .profile-card {
+        padding: 20px;
+      }
+
+      .profile-header {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .profile-avatar {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-logo">RABPro</div>
+      <div class="brand-name">Profil Pengguna</div>
+    </div>
+    <div class="header-spacer"></div>
+    <div class="user-menu">
+      <div class="user-info" onclick="toggleDropdown(event)">
+        <img id="userAvatar" class="user-avatar" src="https://via.placeholder.com/36" alt="Avatar">
+      </div>
+      <div class="dropdown-menu" id="dropdownMenu">
+        <a href="/pages/home.html" class="dropdown-item">← Kembali ke Kalkulator</a>
+        <button id="logoutBtn" class="dropdown-item danger">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <a href="/pages/home.html" class="back-link">← Kembali ke Kalkulator</a>
+
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <div class="profile-header">
+        <img id="avatarImage" class="profile-avatar" src="https://via.placeholder.com/100" alt="Avatar">
+        <div class="profile-info">
+          <h1 id="profileName">Loading...</h1>
+          <p id="profileEmail" style="color: var(--gray-600); margin-bottom: 12px;"></p>
+          <div id="providerBadge" class="provider"></div>
+        </div>
+      </div>
+
+      <div id="userDetails">
+        <div class="info-row">
+          <span class="info-label">Email</span>
+          <span class="info-value" id="detailEmail">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Terdaftar Sejak</span>
+          <span class="info-value" id="detailCreated">-</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Login Terakhir</span>
+          <span class="info-value" id="detailLastLogin">-</span>
+        </div>
+      </div>
+
+      <div id="demoUserDetails" style="display: none; text-align: center; padding: 24px; background: var(--green-l); border-radius: var(--radius-lg); margin-top: 24px;">
+        <p style="color: var(--green); font-weight: 600;">Mode Demo - Data tidak disimpan di server</p>
+        <p style="color: var(--gray-600); font-size: 12px; margin-top: 8px;">Masuk dengan akun untuk menyimpan progres Anda</p>
+      </div>
+    </div>
+
+    <!-- Progress Section -->
+    <div class="profile-card">
+      <div class="progress-section">
+        <h2>Riwayat Proyek</h2>
+        <div id="progressList" class="progress-list">
+          <div class="empty-state">
+            <p>Belum ada proyek tersimpan</p>
+            <p style="font-size: 12px;">Mulai buat kalkulator RAB dan progres Anda akan tersimpan di sini</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/auth.js"></script>
+  <script>
+    // Initialize page
+    async function initPage() {
+      await ensureAuthenticated();
+      await updateUserInfo();
+      loadProfileData();
+      loadProgressList();
+      setupLogoutButton();
+    }
+
+    function loadProfileData() {
+      const user = auth.getUser();
+      
+      if (auth.isDemo) {
+        document.getElementById('userDetails').style.display = 'none';
+        document.getElementById('demoUserDetails').style.display = 'block';
+        document.getElementById('profileName').textContent = user?.name || 'Demo User';
+        document.getElementById('profileEmail').textContent = user?.email || 'demo@rabpro.local';
+        document.getElementById('avatarImage').src = 'https://via.placeholder.com/100';
+        document.getElementById('userAvatar').src = 'https://via.placeholder.com/36';
+      } else {
+        document.getElementById('demoUserDetails').style.display = 'none';
+        document.getElementById('profileName').textContent = user?.name || 'User';
+        document.getElementById('profileEmail').textContent = user?.email || '';
+        document.getElementById('detailEmail').textContent = user?.email || '-';
+        document.getElementById('detailCreated').textContent = formatDate(user?.created_at);
+        document.getElementById('detailLastLogin').textContent = formatDate(user?.last_login);
+        
+        const providerBadge = document.getElementById('providerBadge');
+        const provider = user?.provider || 'unknown';
+        providerBadge.textContent = provider.charAt(0).toUpperCase() + provider.slice(1);
+        
+        if (user?.avatar_url) {
+          document.getElementById('avatarImage').src = user.avatar_url;
+          document.getElementById('userAvatar').src = user.avatar_url;
+        }
+      }
+    }
+
+    async function loadProgressList() {
+      const progressList = document.getElementById('progressList');
+      const progress = await auth.getAllProgress();
+      
+      if (progress.length === 0) {
+        progressList.innerHTML = `
+          <div class="empty-state" style="grid-column: 1/-1;">
+            <p>Belum ada proyek tersimpan</p>
+            <p style="font-size: 12px;">Mulai buat kalkulator RAB dan progres Anda akan tersimpan di sini</p>
+          </div>
+        `;
+        return;
+      }
+
+      progressList.innerHTML = progress.map(p => `
+        <div class="progress-item" onclick="openProject('${p.project_name}')">
+          <div class="progress-item-name">${escapeHtml(p.project_name)}</div>
+          <div class="progress-item-date">${formatDate(p.updated_at)}</div>
+        </div>
+      `).join('');
+    }
+
+    function openProject(projectName) {
+      // Store the project to load and redirect to home
+      localStorage.setItem('loadProject', projectName);
+      window.location.href = '/pages/home.html';
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return '-';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, m => map[m]);
+    }
+
+    function toggleDropdown(event) {
+      event.stopPropagation();
+      document.getElementById('dropdownMenu').classList.toggle('open');
+    }
+
+    document.addEventListener('click', () => {
+      document.getElementById('dropdownMenu').classList.remove('open');
+    });
+
+    // Initialize
+    initPage();
+  </script>
+</body>
+</html>
